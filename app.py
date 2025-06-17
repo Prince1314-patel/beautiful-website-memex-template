@@ -4,11 +4,15 @@ Features: Voice input, text input, AI responses with voice cloning
 """
 
 import os
+from dotenv import load_dotenv
 import tempfile
 import uuid
 from datetime import datetime
 from pathlib import Path
 from typing import List, Dict, Optional
+
+# Load environment variables from .env file
+load_dotenv()
 
 from flask import Flask, render_template, request, jsonify, send_file
 import torch

@@ -1,8 +1,9 @@
-flask==3.1.1
-torch==2.6.0
-torchaudio==2.6.0
-groq==0.28.0
-langchain==0.3.25
-langchain-groq==0.3.2
-chatterbox-tts==0.1.2
-requests==2.32.4
+flask
+torch
+torchaudio
+groq
+langchain
+langchain-groq
+chatterbox-tts
+requests
+python-dotenv

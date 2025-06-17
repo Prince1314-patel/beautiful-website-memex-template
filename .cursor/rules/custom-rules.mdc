@@ -1,0 +1,718 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Voice Chat Application - Coding Standards
+
+## Overview
+This document defines coding standards for the Luna Voice Chat Application to ensure consistency, maintainability, and reduce development errors across multiple developers.
+
+## 1. Python Standards
+
+### 1.1 File Structure and Imports
+```python
+# Standard import order (with 2 blank lines between sections)
+"""
+Module docstring - brief description of the module's purpose.
+"""
+
+# Standard library imports (alphabetical)
+import os
+import tempfile
+import uuid
+from datetime import datetime
+from pathlib import Path
+from typing import List, Dict, Optional
+
+# Third-party imports (alphabetical)
+import torch
+import torchaudio
+from flask import Flask, render_template, request, jsonify, send_file
+from groq import Groq
+from langchain_groq import ChatGroq
+
+# Local imports (alphabetical)
+from local_module import local_function
+```
+
+### 1.2 Function and Variable Naming
+- **Functions**: Use `snake_case` with descriptive names
+  ```python
+  def transcribe_audio(audio_file_path: str) -> str:
+  def generate_ai_response(user_input: str) -> str:
+  ```
+- **Variables**: Use `snake_case` for variables, `UPPER_CASE` for constants
+  ```python
+  groq_client = None
+  SYSTEM_PROMPT = """..."""
+  ```
+- **Classes**: Use `PascalCase`
+  ```python
+  class VoiceChatApp:
+  ```
+
+### 1.3 Function Documentation
+```python
+def function_name(param1: str, param2: Optional[int] = None) -> str:
+    """
+    Brief description of what the function does.
+    
+    Args:
+        param1 (str): Description of parameter
+        param2 (Optional[int], optional): Description of optional parameter
+        
+    Returns:
+        str: Description of return value
+        
+    Raises:
+        ValueError: When parameter is invalid
+        FileNotFoundError: When file doesn't exist
+        
+    Example:
+        >>> result = function_name("test", 42)
+        >>> print(result)
+        "processed result"
+    """
+```
+
+### 1.4 Error Handling
+```python
+def process_audio(audio_path: str) -> str:
+    """Process audio file with proper error handling."""
+    try:
+        if not os.path.exists(audio_path):
+            raise FileNotFoundError(f"Audio file not found: {audio_path}")
+            
+        # Process audio
+        result = audio_processor.process(audio_path)
+        return result
+        
+    except FileNotFoundError as e:
+        print(f"❌ File error: {e}")
+        return ""
+    except Exception as e:
+        print(f"❌ Processing error: {e}")
+        return ""
+    finally:
+        # Cleanup code here
+        pass
+```
+
+### 1.5 Flask Route Standards
+```python
+@app.route('/endpoint', methods=['POST'])
+def endpoint_name():
+    """Handle POST requests to /endpoint."""
+    try:
+        # Validate input
+        if 'required_field' not in request.form:
+            return jsonify({'error': 'Missing required field'}), 400
+            
+        # Process request
+        result = process_request(request.form)
+        
+        return jsonify({'success': True, 'data': result})
+        
+    except Exception as e:
+        print(f"❌ Endpoint error: {e}")
+        return jsonify({'error': 'Internal server error'}), 500
+```
+
+## 2. JavaScript Standards
+
+### 2.1 Class Structure
+```javascript
+/**
+ * Class description
+ */
+class ClassName {
+    constructor() {
+        // Initialize properties
+        this.property1 = null;
+        this.property2 = [];
+        
+        // Call initialization
+        this.init();
+    }
+    
+    init() {
+        // Setup event listeners and initial state
+        this.setupEventListeners();
+        this.setupInitialState();
+    }
+    
+    setupEventListeners() {
+        // Event listener setup
+        const element = document.getElementById('elementId');
+        element.addEventListener('event', (e) => this.handleEvent(e));
+    }
+    
+    async handleEvent(event) {
+        try {
+            // Event handling logic
+            const result = await this.processEvent(event);
+            this.updateUI(result);
+        } catch (error) {
+            console.error('❌ Event handling error:', error);
+            this.showError('Event processing failed');
+        }
+    }
+}
+```
+
+### 2.2 Async/Await Patterns
+```javascript
+async function asyncFunction() {
+    try {
+        const response = await fetch('/api/endpoint', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const result = await response.json();
+        return result;
+        
+    } catch (error) {
+        console.error('❌ API call failed:', error);
+        throw error;
+    }
+}
+```
+
+### 2.3 Error Handling
+```javascript
+function processData(data) {
+    try {
+        // Validate input
+        if (!data || typeof data !== 'object') {
+            throw new Error('Invalid data format');
+        }
+        
+        // Process data
+        const result = dataProcessor.process(data);
+        return result;
+        
+    } catch (error) {
+        console.error('❌ Data processing error:', error);
+        this.showToast('Data processing failed', 'error');
+        return null;
+    }
+}
+```
+
+## 3. HTML Standards
+
+### 3.1 Semantic Structure
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page Title</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Use semantic HTML elements -->
+    <header class="app-header">
+        <nav class="navigation">
+            <!-- Navigation content -->
+        </nav>
+    </header>
+    
+    <main class="main-content">
+        <section class="content-section">
+            <!-- Main content -->
+        </section>
+    </main>
+    
+    <footer class="app-footer">
+        <!-- Footer content -->
+    </footer>
+</body>
+</html>
+```
+
+### 3.2 Accessibility Standards
+```html
+<!-- Always include proper ARIA labels and roles -->
+<button 
+    class="voice-btn" 
+    id="voiceBtn" 
+    aria-label="Record voice message"
+    aria-pressed="false"
+    title="Click and hold to record">
+    <i class="fas fa-microphone" aria-hidden="true"></i>
+    <span class="btn-text">Hold to Talk</span>
+</button>
+
+<!-- Form elements with proper labels -->
+<label for="messageInput" class="sr-only">Message input</label>
+<textarea 
+    id="messageInput" 
+    name="message"
+    placeholder="Type your message here..." 
+    aria-describedby="messageHelp"
+    rows="3"
+    maxlength="500">
+</textarea>
+<div id="messageHelp" class="help-text">Maximum 500 characters</div>
+```
+
+## 4. CSS Standards
+
+### 4.1 CSS Custom Properties
+```css
+/* Define variables at the top of the file */
+:root {
+    /* Colors */
+    --primary-color: #667eea;
+    --secondary-color: #764ba2;
+    --bg-primary: #0f0f23;
+    --text-primary: #ffffff;
+    
+    /* Spacing */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    
+    /* Typography */
+    --font-family: 'Poppins', sans-serif;
+    --font-size-sm: 0.875rem;
+    --font-size-base: 1rem;
+    --font-size-lg: 1.125rem;
+    
+    /* Transitions */
+    --transition-fast: 0.15s ease;
+    --transition-normal: 0.3s ease;
+    --transition-slow: 0.5s ease;
+}
+```
+
+### 4.2 Component Structure
+```css
+/* Component: Button */
+.btn {
+    /* Base styles */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: none;
+    border-radius: 8px;
+    font-family: var(--font-family);
+    font-size: var(--font-size-base);
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    
+    /* States */
+    &:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    &:active {
+        transform: translateY(0);
+    }
+    
+    &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+}
+
+/* Variants */
+.btn--primary {
+    background: var(--primary-color);
+    color: var(--text-primary);
+}
+
+.btn--secondary {
+    background: var(--secondary-color);
+    color: var(--text-primary);
+}
+```
+
+### 4.3 Responsive Design
+```css
+/* Mobile-first approach */
+.container {
+    max-width: 100%;
+    padding: var(--spacing-md);
+    margin: 0 auto;
+}
+
+/* Tablet and up */
+@media (min-width: 768px) {
+    .container {
+        max-width: 750px;
+        padding: var(--spacing-lg);
+    }
+}
+
+/* Desktop and up */
+@media (min-width: 1024px) {
+    .container {
+        max-width: 1200px;
+        padding: var(--spacing-xl);
+    }
+}
+```
+
+## 5. File Organization Standards
+
+### 5.1 Directory Structure
+```
+voice_chat_app_architecture/
+├── app.py                 # Main Flask application
+├── demo.py               # Demo/testing script
+├── requirements.txt      # Python dependencies
+├── README.md            # Project documentation
+├── setup.bat            # Setup script
+├── run.bat              # Run script
+├── templates/           # HTML templates
+│   └── index.html      # Main template
+├── static/             # Static assets
+│   ├── style.css       # Main stylesheet
+│   └── script.js       # Main JavaScript
+└── tests/              # Test files
+    └── test_setup.py   # Setup tests
+```
+
+### 5.2 File Naming Conventions
+- **Python files**: `snake_case.py`
+- **JavaScript files**: `camelCase.js` or `kebab-case.js`
+- **CSS files**: `kebab-case.css`
+- **HTML files**: `kebab-case.html`
+- **Test files**: `test_*.py` for Python, `*.test.js` for JavaScript
+
+## 6. Documentation Standards
+
+### 6.1 README Structure
+```markdown
+# Project Name
+
+Brief description of the project.
+
+## Features
+- Feature 1
+- Feature 2
+
+## Installation
+Step-by-step installation instructions.
+
+## Usage
+How to use the application.
+
+## API Reference
+Documentation for API endpoints.
+
+## Contributing
+Guidelines for contributors.
+
+## License
+License information.
+```
+
+### 6.2 Code Comments
+```python
+# Single line comment for simple explanations
+
+# Multi-line comment for complex logic
+# This section handles audio processing with the following steps:
+# 1. Validate input format
+# 2. Process audio data
+# 3. Return processed result
+
+def complex_function():
+    """Function docstring for complex functions."""
+    # Implementation
+    pass
+```
+
+## 7. Testing Standards
+
+### 7.1 Python Testing
+```python
+import unittest
+from unittest.mock import patch, MagicMock
+
+class TestAudioProcessing(unittest.TestCase):
+    """Test cases for audio processing functionality."""
+    
+    def setUp(self):
+        """Set up test fixtures."""
+        self.test_audio_path = "test_audio.wav"
+    
+    def test_transcribe_audio_success(self):
+        """Test successful audio transcription."""
+        with patch('app.groq_client') as mock_client:
+            mock_client.audio.transcriptions.create.return_value = "Test transcription"
+            result = transcribe_audio(self.test_audio_path)
+            self.assertEqual(result, "Test transcription")
+    
+    def test_transcribe_audio_failure(self):
+        """Test audio transcription failure."""
+        with patch('app.groq_client') as mock_client:
+            mock_client.audio.transcriptions.create.side_effect = Exception("API Error")
+            result = transcribe_audio(self.test_audio_path)
+            self.assertEqual(result, "")
+```
+
+### 7.2 JavaScript Testing
+```javascript
+// Example test structure (if using Jest)
+describe('VoiceChatApp', () => {
+    let app;
+    
+    beforeEach(() => {
+        app = new VoiceChatApp();
+    });
+    
+    test('should initialize correctly', () => {
+        expect(app.mediaRecorder).toBeNull();
+        expect(app.isRecording).toBe(false);
+    });
+    
+    test('should handle recording start', async () => {
+        // Mock getUserMedia
+        global.navigator.mediaDevices.getUserMedia = jest.fn().mockResolvedValue({});
+        
+        await app.startRecording();
+        expect(app.isRecording).toBe(true);
+    });
+});
+```
+
+## 8. Security Standards
+
+### 8.1 Input Validation
+```python
+def validate_user_input(user_input: str) -> bool:
+    """Validate user input for security."""
+    if not user_input or len(user_input.strip()) == 0:
+        return False
+    
+    # Check for potentially dangerous content
+    dangerous_patterns = ['<script>', 'javascript:', 'data:text/html']
+    for pattern in dangerous_patterns:
+        if pattern.lower() in user_input.lower():
+            return False
+    
+    return True
+```
+
+### 8.2 File Upload Security
+```python
+def validate_audio_file(file) -> bool:
+    """Validate uploaded audio file."""
+    allowed_extensions = {'.wav', '.mp3', '.m4a', '.ogg'}
+    max_size = 16 * 1024 * 1024  # 16MB
+    
+    if not file or file.filename == '':
+        return False
+    
+    # Check file extension
+    file_ext = Path(file.filename).suffix.lower()
+    if file_ext not in allowed_extensions:
+        return False
+    
+    # Check file size
+    file.seek(0, 2)  # Seek to end
+    file_size = file.tell()
+    file.seek(0)  # Reset to beginning
+    
+    if file_size > max_size:
+        return False
+    
+    return True
+```
+
+## 9. Performance Standards
+
+### 9.1 Python Performance
+```python
+# Use list comprehensions over loops when appropriate
+# Good
+squares = [x**2 for x in range(10)]
+
+# Use generators for large datasets
+def process_large_dataset(data):
+    """Process large dataset using generator."""
+    for item in data:
+        yield process_item(item)
+
+# Cache expensive operations
+from functools import lru_cache
+
+@lru_cache(maxsize=128)
+def expensive_calculation(param):
+    """Cache expensive calculations."""
+    return complex_calculation(param)
+```
+
+### 9.2 JavaScript Performance
+```javascript
+// Debounce expensive operations
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+// Use event delegation for dynamic content
+document.addEventListener('click', (e) => {
+    if (e.target.matches('.dynamic-button')) {
+        handleButtonClick(e.target);
+    }
+});
+```
+
+## 10. Error Reporting Standards
+
+### 10.1 Python Error Reporting
+```python
+import logging
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('app.log'),
+        logging.StreamHandler()
+    ]
+)
+
+logger = logging.getLogger(__name__)
+
+def process_with_logging():
+    """Process with proper logging."""
+    try:
+        logger.info("Starting processing")
+        result = process_data()
+        logger.info("Processing completed successfully")
+        return result
+    except Exception as e:
+        logger.error(f"Processing failed: {e}", exc_info=True)
+        raise
+```
+
+### 10.2 JavaScript Error Reporting
+```javascript
+// Global error handler
+window.addEventListener('error', (event) => {
+    console.error('Global error:', event.error);
+    // Send to error reporting service
+    reportError(event.error);
+});
+
+// Async error handling
+window.addEventListener('unhandledrejection', (event) => {
+    console.error('Unhandled promise rejection:', event.reason);
+    event.preventDefault();
+});
+```
+
+## 11. Code Review Checklist
+
+### 11.1 Python Review Checklist
+- [ ] Functions have proper docstrings
+- [ ] Error handling is implemented
+- [ ] Type hints are used where appropriate
+- [ ] No hardcoded values (use constants)
+- [ ] Logging is implemented for errors
+- [ ] Input validation is present
+- [ ] Security considerations addressed
+
+### 11.2 JavaScript Review Checklist
+- [ ] Classes are properly structured
+- [ ] Error handling with try-catch
+- [ ] Async/await used correctly
+- [ ] Event listeners are properly managed
+- [ ] No console.log in production code
+- [ ] Accessibility attributes present
+- [ ] Mobile responsiveness considered
+
+### 11.3 HTML/CSS Review Checklist
+- [ ] Semantic HTML used
+- [ ] Accessibility attributes present
+- [ ] CSS custom properties used
+- [ ] Responsive design implemented
+- [ ] No inline styles
+- [ ] Proper class naming conventions
+- [ ] Cross-browser compatibility
+
+## 12. Deployment Standards
+
+### 12.1 Environment Configuration
+```python
+# Use environment variables for configuration
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+# Configuration
+DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
+API_KEY = os.getenv('GROQ_API_KEY')
+DATABASE_URL = os.getenv('DATABASE_URL')
+```
+
+### 12.2 Production Considerations
+- Remove debug mode in production
+- Use proper WSGI server (Gunicorn, uWSGI)
+- Implement proper logging
+- Set up monitoring and error tracking
+- Use HTTPS in production
+- Implement rate limiting
+- Set up backup strategies
+
+---
+
+**Note**: These standards should be reviewed and updated regularly as the project evolves. All team members should be familiar with these guidelines and follow them consistently.
+```
+
+## Implementation Steps
+
+To implement these coding standards:
+
+1. **Replace the empty custom-rules.mdc file** with the comprehensive standards above
+2. **Create a coding standards review process** for your team
+3. **Set up automated tools** to help enforce standards:
+   - Python: flake8, black, mypy
+   - JavaScript: ESLint, Prettier
+   - HTML/CSS: HTMLHint, Stylelint
+4. **Regular team training** on the standards
+5. **Code review checklist** integration
+
+These standards address the key areas that can lead to hallucination and inconsistencies:
+- **Clear naming conventions** prevent confusion
+- **Structured error handling** reduces unexpected behavior
+- **Comprehensive documentation** ensures understanding
+- **Security guidelines** prevent vulnerabilities
+- **Performance considerations** maintain application quality
+
+
+
+
+The standards are designed to be practical and enforceable while promoting best practices across your voice chat application development team.
