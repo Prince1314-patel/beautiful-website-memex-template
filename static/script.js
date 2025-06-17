@@ -37,29 +37,30 @@ class VoiceChatApp {
         const sendBtn = document.getElementById('sendBtn');
         
         sendBtn.addEventListener('click', () => this.sendTextMessage());
-        messageInput.addEventListener('keypress', (e) => {
+        messageInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
                 this.sendTextMessage();
             }
         });
 
+        // Auto-grow textarea
+        messageInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+
         // Reference audio upload
         const referenceAudio = document.getElementById('referenceAudio');
         const uploadArea = document.getElementById('uploadArea');
         
-        uploadArea.addEventListener('click', () => referenceAudio.click());
-        referenceAudio.addEventListener('change', (e) => this.handleReferenceUpload(e));
+        if (uploadArea && referenceAudio) {
+            uploadArea.addEventListener('click', () => referenceAudio.click());
+            referenceAudio.addEventListener('change', (e) => this.handleReferenceUpload(e));
+        }
 
         // Controls
         document.getElementById('clearBtn').addEventListener('click', () => this.clearHistory());
-        
-        // Prevent form submission on Enter in textarea
-        messageInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-            }
-        });
     }
 
     setupDragAndDrop() {

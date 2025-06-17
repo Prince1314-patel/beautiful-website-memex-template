@@ -47,38 +47,20 @@
 
             <!-- Input Controls -->
             <div class="input-section">
-                <!-- Voice Input -->
-                <div class="voice-input-container">
-                    <button class="voice-btn" id="voiceBtn" title="Click and hold to record">
-                        <i class="fas fa-microphone"></i>
-                        <span class="btn-text">Hold to Talk</span>
-                    </button>
-                    <div class="recording-indicator" id="recordingIndicator">
-                        <div class="pulse"></div>
-                        <span>Recording...</span>
-                    </div>
-                </div>
-
-                <!-- Text Input -->
+                <!-- Text Input and Controls (WhatsApp style) -->
                 <div class="text-input-container">
                     <textarea 
                         id="messageInput" 
-                        placeholder="Type your message here..." 
-                        rows="3"
+                        placeholder="Type a message" 
+                        rows="1"
                         maxlength="500"
+                        autocomplete="off"
                     ></textarea>
+                    <button class="voice-btn" id="voiceBtn" title="Record audio">
+                        <i class="fas fa-microphone"></i>
+                    </button>
                     <button class="send-btn" id="sendBtn">
                         <i class="fas fa-paper-plane"></i>
-                    </button>
-                </div>
-
-                <!-- Controls -->
-                <div class="controls">
-                    <button class="control-btn" id="clearBtn" title="Clear Chat">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                    <button class="control-btn" id="settingsBtn" title="Settings">
-                        <i class="fas fa-cog"></i>
                     </button>
                 </div>
             </div>
