@@ -5,6 +5,7 @@ class VoiceChatApp {
         this.audioChunks = [];
         this.isRecording = false;
         this.isProcessing = false;
+        this.aiProcessingMessageElement = null; // To keep track of the AI processing message element
         
         this.init();
     }
@@ -146,9 +147,15 @@ class VoiceChatApp {
         if (this.audioChunks.length === 0) return;
         
         try {
-            this.showLoading(true);
-            
             const audioBlob = new Blob(this.audioChunks, { type: 'audio/wav' });
+            const audioUrl = URL.createObjectURL(audioBlob); // Create a local URL for user's voice message
+
+            // Immediately display user's voice message
+            this.addMessageToChat('Voice message', 'user', audioUrl, true); 
+            
+            // Display processing message
+            this.aiProcessingMessageElement = this.addProcessingMessage();
+            
             const formData = new FormData();
             formData.append('audio', audioBlob, 'recording.wav');
             formData.append('type', 'voice');
@@ -169,8 +176,10 @@ class VoiceChatApp {
         } catch (error) {
             console.error('❌ Error processing recording:', error);
             this.showToast('Failed to process voice message. Please try again.', 'error');
-        } finally {
-            this.showLoading(false);
+            if (this.aiProcessingMessageElement) {
+                this.aiProcessingMessageElement.remove(); // Remove processing message on error
+                this.aiProcessingMessageElement = null;
+            }
         }
     }
 
@@ -181,9 +190,14 @@ class VoiceChatApp {
         if (!message || this.isProcessing) return;
         
         try {
-            this.showLoading(true);
-            messageInput.value = '';
-            
+            // Immediately display user's text message
+            this.addMessageToChat(message, 'user');
+            messageInput.value = ''; // Clear input field after displaying message
+            messageInput.style.height = 'auto'; // Reset textarea height
+
+            // Display processing message
+            this.aiProcessingMessageElement = this.addProcessingMessage();
+
             const formData = new FormData();
             formData.append('message', message);
             formData.append('type', 'text');
@@ -205,22 +219,31 @@ class VoiceChatApp {
             console.error('❌ Error sending message:', error);
             this.showToast('Failed to send message. Please try again.', 'error');
             messageInput.value = message; // Restore message
-        } finally {
-            this.showLoading(false);
+            if (this.aiProcessingMessageElement) {
+                this.aiProcessingMessageElement.remove(); // Remove processing message on error
+                this.aiProcessingMessageElement = null;
+            }
         }
     }
 
     handleChatResponse(data) {
         if (data.error) {
             this.showToast(data.error, 'error');
+            if (this.aiProcessingMessageElement) {
+                this.aiProcessingMessageElement.remove(); // Remove processing message on error
+                this.aiProcessingMessageElement = null;
+            }
             return;
         }
         
         console.log('✅ Received response:', data);
         
-        // Add user message to chat history
-        this.addMessageToChat(data.user_message, 'user');
-        
+        // Remove processing message if it exists
+        if (this.aiProcessingMessageElement) {
+            this.aiProcessingMessageElement.remove();
+            this.aiProcessingMessageElement = null;
+        }
+
         // Add AI response to chat history (text is hidden, only audio)
         this.addMessageToChat(data.ai_response, 'assistant', data.audio_url, !data.audio_available);
         
@@ -242,61 +265,89 @@ class VoiceChatApp {
         const contentDiv = document.createElement('div');
         contentDiv.className = 'message-content';
 
-        // WhatsApp-style: Always show user voice as audio bubble
-        if (type === 'user' && audioUrl) {
-            contentDiv.innerHTML = `
-                <div class="wa-audio-bubble">
+        if (audioUrl) {
+            // If audio URL is provided, always show as an audio bubble
+            let audioPlayerHtml = `
+                <div class="wa-audio-bubble ${type}">
                     <button class="wa-audio-play" aria-label="Play/Pause" tabindex="0"></button>
                     <audio class="wa-audio-player" src="${audioUrl}" preload="auto"></audio>
-                    <span class="wa-audio-time">Voice message</span>
+                    <div class="wa-audio-time"></div>
                 </div>
             `;
-        } else if (type === 'assistant' && audioUrl && !showText) {
-            // WhatsApp-style AI audio bubble
-            contentDiv.innerHTML = `
-                <div class="wa-audio-bubble ai">
-                    <button class="wa-audio-play" aria-label="Play/Pause" tabindex="0"></button>
-                    <audio class="wa-audio-player" src="${audioUrl}" preload="auto"></audio>
-                    <span class="wa-audio-time">AI voice</span>
-                </div>
-            `;
-        } else {
-            // Fallback: text bubble
+            // For user voice messages, show a small text indicator (e.g., "Voice message") or transcribed text if available
+            if (type === 'user' && content) {
+                 audioPlayerHtml += `<p class="audio-transcript">${this.escapeHtml(content)}</p>`;
+            }
+            contentDiv.innerHTML = audioPlayerHtml;
+        } else if (showText || type === 'user') { // Always show text for user text messages
             contentDiv.innerHTML = `<p>${this.escapeHtml(content)}</p>`;
         }
-
+        
         messageDiv.appendChild(avatarDiv);
         messageDiv.appendChild(contentDiv);
         chatHistory.appendChild(messageDiv);
         chatHistory.scrollTop = chatHistory.scrollHeight;
 
-        // Attach play/pause logic for WhatsApp-style audio bubbles
-        const waAudioBubbles = contentDiv.querySelectorAll('.wa-audio-bubble');
-        waAudioBubbles.forEach(bubble => {
-            const playBtn = bubble.querySelector('.wa-audio-play');
-            const audio = bubble.querySelector('.wa-audio-player');
-            let isPlaying = false;
-            playBtn.innerHTML = '<i class="fas fa-play"></i>';
-            playBtn.onclick = () => {
-                if (isPlaying) {
-                    audio.pause();
-                } else {
-                    audio.play();
-                }
-            };
-            audio.onplay = () => {
-                isPlaying = true;
-                playBtn.innerHTML = '<i class="fas fa-pause"></i>';
-            };
-            audio.onpause = () => {
-                isPlaying = false;
-                playBtn.innerHTML = '<i class="fas fa-play"></i>';
-            };
-            audio.onended = () => {
-                isPlaying = false;
-                playBtn.innerHTML = '<i class="fas fa-play"></i>';
-            };
-        });
+        // Setup audio player if present
+        if (audioUrl) {
+            const audioPlayer = contentDiv.querySelector('.wa-audio-player');
+            const playButton = contentDiv.querySelector('.wa-audio-play');
+            const timeDisplay = contentDiv.querySelector('.wa-audio-time');
+
+            if (audioPlayer && playButton && timeDisplay) {
+                audioPlayer.addEventListener('loadedmetadata', () => {
+                    const duration = audioPlayer.duration;
+                    const minutes = Math.floor(duration / 60);
+                    const seconds = Math.floor(duration % 60).toString().padStart(2, '0');
+                    timeDisplay.textContent = `${minutes}:${seconds}`;
+                });
+
+                playButton.addEventListener('click', () => {
+                    if (audioPlayer.paused) {
+                        audioPlayer.play();
+                        playButton.classList.add('playing');
+                    } else {
+                        audioPlayer.pause();
+                        playButton.classList.remove('playing');
+                    }
+                });
+
+                audioPlayer.addEventListener('timeupdate', () => {
+                    const currentTime = audioPlayer.currentTime;
+                    const duration = audioPlayer.duration;
+                    if (duration) {
+                        const progress = (currentTime / duration) * 100;
+                        playButton.style.background = `conic-gradient(var(--success) ${progress}%, transparent ${progress}%)`;
+                    }
+                });
+
+                audioPlayer.addEventListener('ended', () => {
+                    playButton.classList.remove('playing');
+                    playButton.style.background = ''; // Reset background
+                    audioPlayer.currentTime = 0; // Reset audio to start
+                });
+            }
+        }
+    }
+
+    addProcessingMessage() {
+        const chatHistory = document.getElementById('chatHistory');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'message assistant processing'; // Add 'processing' class for styling
+        
+        const avatarDiv = document.createElement('div');
+        avatarDiv.className = 'avatar ai-avatar';
+        avatarDiv.innerHTML = '<i class="fas fa-robot"></i>';
+        
+        const contentDiv = document.createElement('div');
+        contentDiv.className = 'message-content';
+        contentDiv.innerHTML = '<p>AI is processing...</p><div class="processing-spinner"></div>'; // Add spinner placeholder
+
+        messageDiv.appendChild(avatarDiv);
+        messageDiv.appendChild(contentDiv);
+        chatHistory.appendChild(messageDiv);
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+        return messageDiv; // Return the element to be able to remove/update it later
     }
 
     async handleReferenceUpload(event) {
