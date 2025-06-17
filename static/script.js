@@ -233,60 +233,69 @@ class VoiceChatApp {
 
     addMessageToChat(content, type, audioUrl = null, showText = false) {
         const chatHistory = document.getElementById('chatHistory');
-        
         const messageDiv = document.createElement('div');
         messageDiv.className = `message ${type}`;
-        
         const avatarDiv = document.createElement('div');
         avatarDiv.className = `avatar ${type}-avatar`;
         avatarDiv.innerHTML = type === 'user' ? '<i class="fas fa-user"></i>' : '<i class="fas fa-robot"></i>';
-        
         const contentDiv = document.createElement('div');
         contentDiv.className = 'message-content';
-        
-        // For AI responses, only show text if audio failed
-        if (type === 'assistant' && audioUrl && !showText) {
+
+        // WhatsApp-style: Always show user voice as audio bubble
+        if (type === 'user' && audioUrl) {
             contentDiv.innerHTML = `
-                <div class="message-actions">
-                    <button class="action-btn" onclick="this.nextElementSibling.play()">
-                        <i class="fas fa-play"></i> Play Response
-                    </button>
-                    <audio class="audio-player" controls>
-                        <source src="${audioUrl}" type="audio/wav">
-                        Your browser does not support audio playback.
-                    </audio>
+                <div class="wa-audio-bubble">
+                    <button class="wa-audio-play" aria-label="Play/Pause" tabindex="0"></button>
+                    <audio class="wa-audio-player" src="${audioUrl}" preload="auto"></audio>
+                    <span class="wa-audio-time">Voice message</span>
+                </div>
+            `;
+        } else if (type === 'assistant' && audioUrl && !showText) {
+            // WhatsApp-style AI audio bubble
+            contentDiv.innerHTML = `
+                <div class="wa-audio-bubble ai">
+                    <button class="wa-audio-play" aria-label="Play/Pause" tabindex="0"></button>
+                    <audio class="wa-audio-player" src="${audioUrl}" preload="auto"></audio>
+                    <span class="wa-audio-time">AI voice</span>
                 </div>
             `;
         } else {
+            // Fallback: text bubble
             contentDiv.innerHTML = `<p>${this.escapeHtml(content)}</p>`;
-            
-            if (audioUrl) {
-                contentDiv.innerHTML += `
-                    <div class="message-actions">
-                        <audio class="audio-player" controls>
-                            <source src="${audioUrl}" type="audio/wav">
-                            Your browser does not support audio playback.
-                        </audio>
-                    </div>
-                `;
-            }
         }
-        
+
         messageDiv.appendChild(avatarDiv);
         messageDiv.appendChild(contentDiv);
-        
         chatHistory.appendChild(messageDiv);
         chatHistory.scrollTop = chatHistory.scrollHeight;
-        
-        // Auto-play AI audio responses
-        if (type === 'assistant' && audioUrl) {
-            setTimeout(() => {
-                const audio = messageDiv.querySelector('audio');
-                if (audio) {
-                    audio.play().catch(e => console.log('Auto-play prevented:', e));
+
+        // Attach play/pause logic for WhatsApp-style audio bubbles
+        const waAudioBubbles = contentDiv.querySelectorAll('.wa-audio-bubble');
+        waAudioBubbles.forEach(bubble => {
+            const playBtn = bubble.querySelector('.wa-audio-play');
+            const audio = bubble.querySelector('.wa-audio-player');
+            let isPlaying = false;
+            playBtn.innerHTML = '<i class="fas fa-play"></i>';
+            playBtn.onclick = () => {
+                if (isPlaying) {
+                    audio.pause();
+                } else {
+                    audio.play();
                 }
-            }, 500);
-        }
+            };
+            audio.onplay = () => {
+                isPlaying = true;
+                playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+            };
+            audio.onpause = () => {
+                isPlaying = false;
+                playBtn.innerHTML = '<i class="fas fa-play"></i>';
+            };
+            audio.onended = () => {
+                isPlaying = false;
+                playBtn.innerHTML = '<i class="fas fa-play"></i>';
+            };
+        });
     }
 
     async handleReferenceUpload(event) {
@@ -302,8 +311,8 @@ class VoiceChatApp {
             return;
         }
         
-        if (file.size > 16 * 1024 * 1024) { // 16MB limit
-            this.showToast('File size must be less than 16MB', 'error');
+        if (file.size > 50 * 1024 * 1024) { // 50MB limit
+            this.showToast('File size must be less than 50MB', 'error');
             return;
         }
         
@@ -409,6 +418,14 @@ class VoiceChatApp {
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
+    }
+
+    formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     }
 }
 

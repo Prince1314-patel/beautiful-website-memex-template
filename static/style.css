@@ -242,23 +242,29 @@ body {
 }
 
 .message-content {
-    max-width: 70%;
-    background: var(--bg-card);
-    border-radius: 18px;
-    padding: 15px 20px;
-    position: relative;
-    border: 1px solid var(--border);
+    max-width: 80%;
+    background: #e1ffc7;
+    border-radius: 18px 18px 4px 18px;
+    padding: 16px 22px;
+    font-size: 1.05rem;
+    border: none;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
 }
 
 .message.user .message-content {
-    background: var(--primary-color);
-    color: white;
+    background: #dcf8c6;
+    color: #222;
+    border-radius: 18px 4px 18px 18px;
 }
 
-.message-content p {
-    margin: 0;
-    line-height: 1.6;
-    font-size: 0.95rem;
+.message.assistant .message-content {
+    background: #fff;
+    color: #222;
+    border-radius: 4px 18px 18px 18px;
+    font-weight: 500;
+    font-size: 1.08rem;
+    min-width: 220px;
+    box-shadow: 0 2px 12px rgba(102,126,234,0.08);
 }
 
 .message-actions {
@@ -575,7 +581,15 @@ body {
     }
     
     .message-content {
-        max-width: 85%;
+        max-width: 95%;
+        font-size: 1rem;
+        padding: 12px 10px;
+    }
+    
+    .wa-audio-bubble {
+        min-width: 120px;
+        max-width: 98vw;
+        padding: 8px 8px;
     }
     
     .input-section {
@@ -656,4 +670,46 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
     background: var(--primary-color);
+}
+
+/* WhatsApp-style audio bubble */
+.wa-audio-bubble {
+    display: flex;
+    align-items: center;
+    background: #f0f0f0;
+    border-radius: 16px;
+    padding: 10px 16px;
+    gap: 12px;
+    min-width: 180px;
+    max-width: 320px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+.wa-audio-bubble.ai {
+    background: #e6e6fa;
+}
+.wa-audio-play {
+    background: #25d366;
+    border: none;
+    border-radius: 50%;
+    width: 38px;
+    height: 38px;
+    color: #fff;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.wa-audio-play:hover {
+    background: #128c7e;
+}
+.wa-audio-player {
+    display: none;
+}
+.wa-audio-time {
+    font-size: 0.92rem;
+    color: #555;
+    margin-left: 8px;
 }

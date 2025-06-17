@@ -24,7 +24,7 @@ from langchain.schema import HumanMessage, SystemMessage
 
 # Initialize Flask app
 app = Flask(__name__)
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
+app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50MB max file size
 
 # Global variables for models and state
 groq_client = None
