@@ -379,19 +379,20 @@ class VoiceChatApp {
     }
 
     showLoading(show) {
-        this.isProcessing = show;
-        const overlay = document.getElementById('loadingOverlay');
-        const sendBtn = document.getElementById('sendBtn');
-        const voiceBtn = document.getElementById('voiceBtn');
-        
+        const progressBar = document.getElementById('progressBar');
+        if (!progressBar) return;
         if (show) {
-            overlay.classList.add('show');
-            sendBtn.disabled = true;
-            voiceBtn.disabled = true;
+            progressBar.style.width = '0%';
+            progressBar.style.opacity = '1';
+            setTimeout(() => {
+                progressBar.style.width = '80%';
+            }, 50);
         } else {
-            overlay.classList.remove('show');
-            sendBtn.disabled = false;
-            voiceBtn.disabled = false;
+            progressBar.style.width = '100%';
+            setTimeout(() => {
+                progressBar.style.opacity = '0';
+                progressBar.style.width = '0%';
+            }, 400);
         }
     }
 

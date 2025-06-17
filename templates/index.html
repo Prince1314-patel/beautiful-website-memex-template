@@ -18,12 +18,12 @@
             <p class="tagline">Your Empathetic AI Companion</p>
         </header>
 
-        <!-- Reference Audio Upload Section -->
-        <section class="reference-upload">
-            <div class="upload-card">
+        <!-- Reference Audio Upload Section (centered card above chat) -->
+        <section class="reference-upload-centered">
+            <div class="upload-card-centered">
                 <h3><i class="fas fa-microphone-alt"></i> Voice Cloning (Optional)</h3>
                 <p>Upload a reference audio to clone your voice for AI responses</p>
-                <div class="upload-area" id="uploadArea">
+                <div class="upload-area-centered" id="uploadArea">
                     <i class="fas fa-cloud-upload-alt upload-icon"></i>
                     <p>Drop your audio file here or <span class="upload-link">browse</span></p>
                     <input type="file" id="referenceAudio" accept="audio/*" hidden>
@@ -31,6 +31,9 @@
                 <div class="upload-status" id="uploadStatus"></div>
             </div>
         </section>
+
+        <!-- Progress Bar (for background processing) -->
+        <div id="progressBar" class="progress-bar"></div>
 
         <!-- Chat Interface -->
         <main class="chat-container">
@@ -65,14 +68,6 @@
                 </div>
             </div>
         </main>
-
-        <!-- Loading Overlay -->
-        <div class="loading-overlay" id="loadingOverlay">
-            <div class="loading-spinner">
-                <div class="spinner"></div>
-                <p>Processing your message...</p>
-            </div>
-        </div>
 
         <!-- Toast Notifications -->
         <div class="toast" id="toast"></div>

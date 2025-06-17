@@ -422,3 +422,131 @@ body {
 ::-webkit-scrollbar-thumb:hover {
     background: var(--primary-color);
 }
+
+/* Centered Reference Upload Card */
+.reference-upload-centered {
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+    background: transparent;
+}
+.upload-card-centered {
+    background: #202c33;
+    border-radius: 16px;
+    padding: 32px 32px 24px 32px;
+    margin: 24px auto 18px auto;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.10);
+    text-align: center;
+    max-width: 420px;
+    width: 100%;
+    border: 1.5px solid #222e35;
+}
+.upload-card-centered h3 {
+    color: #25d366;
+    margin-bottom: 10px;
+    font-size: 1.18rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+.upload-card-centered p {
+    color: #e9edef;
+    margin-bottom: 18px;
+    font-size: 1rem;
+}
+.upload-area-centered {
+    border: 2px dashed #25d366;
+    border-radius: 12px;
+    padding: 32px 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: #111b21;
+    margin-bottom: 10px;
+}
+.upload-area-centered:hover {
+    border-color: #53bdeb;
+    background: #202c33;
+}
+.upload-icon {
+    font-size: 2.5rem;
+    color: #25d366;
+    margin-bottom: 12px;
+    display: block;
+}
+.upload-link {
+    color: #53bdeb;
+    text-decoration: underline;
+    cursor: pointer;
+}
+.upload-status {
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 0.98rem;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+    color: #25d366;
+    background: #1a282f;
+    border: 1px solid #25d366;
+    display: inline-block;
+}
+.upload-status.error {
+    color: #ff5252;
+    background: #2a1a1a;
+    border: 1px solid #ff5252;
+}
+.upload-status.info {
+    color: #53bdeb;
+    background: #1a232f;
+    border: 1px solid #53bdeb;
+}
+
+/* Add spacing between upload card and chat */
+.reference-upload-centered + .chat-container {
+    margin-top: 0px;
+}
+
+/* Chat area spacing improvements */
+.chat-history {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    margin-bottom: 0;
+}
+.message {
+    margin-bottom: 10px;
+}
+.input-section {
+    padding-bottom: 18px;
+}
+
+@media (max-width: 600px) {
+    .upload-card-centered {
+        padding: 18px 6vw 14px 6vw;
+        max-width: 98vw;
+    }
+    .upload-area-centered {
+        padding: 18px 4vw;
+    }
+}
+
+/* Progress Bar for background processing */
+.progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 0%;
+    height: 4px;
+    background: linear-gradient(90deg, #25d366 0%, #53bdeb 100%);
+    z-index: 1002;
+    transition: width 0.3s cubic-bezier(0.4,0,0.2,1);
+    box-shadow: 0 2px 8px rgba(37,211,102,0.08);
+}
+
+.loading-overlay {
+    display: none !important;
+}
